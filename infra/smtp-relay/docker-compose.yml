@@ -1,0 +1,31 @@
+services:
+  smtp-relay:
+    image: boky/postfix:latest
+    container_name: smtp-relay
+    restart: unless-stopped
+    environment:
+      # Target: Microsoft 365 SMTP (port 587 with STARTTLS)
+      RELAYHOST: "[smtp.office365.com]:587"
+      RELAYHOST_USERNAME: ${SMTP_USERNAME}
+      RELAYHOST_PASSWORD: ${SMTP_PASSWORD}
+      POSTFIX_myhostname: ${SMTP_HOSTNAME}
+      ALLOWED_SENDER_DOMAINS: ${SMTP_DOMAIN}
+      # STARTTLS — required by Microsoft 365
+      POSTFIX_smtp_sasl_auth_enable: "yes"
+      POSTFIX_smtp_sasl_security_options: noanonymous
+      POSTFIX_smtp_tls_security_level: encrypt
+      POSTFIX_smtp_use_tls: "yes"
+    networks:
+      - auth-network
+    security_opt:
+      - no-new-privileges:true
+    # No ports exposed to host — internal traffic only via auth-network
+    #
+    # Microsoft 365 NOTE:
+    # M365 retired Basic Auth (September 2023). If your tenant has it disabled,
+    # upgrade to XOAUTH2: replace this image with a custom Postfix + cyrus-sasl-xoauth2
+    # build using SMTP_TENANT_ID, SMTP_CLIENT_ID, SMTP_CLIENT_SECRET from .env.template.
+
+networks:
+  auth-network:
+    external: true
