@@ -1,0 +1,37 @@
+services:
+  postgres-auth:
+    image: postgres:15-alpine
+    container_name: postgres-auth
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_AUTH_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_AUTH_PASSWORD}
+      POSTGRES_DB: postgres
+      KC_DB_USER: ${KC_DB_USER}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      INFISICAL_DB_USER: ${INFISICAL_DB_USER}
+      INFISICAL_DB_PASSWORD: ${INFISICAL_DB_PASSWORD}
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - db-auth-network
+      - backup-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_AUTH_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres-auth-data:
+    name: postgres-auth-data
+
+networks:
+  db-auth-network:
+    external: true
+  backup-network:
+    external: true
