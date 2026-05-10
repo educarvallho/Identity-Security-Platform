@@ -2,7 +2,7 @@
 
 > Plataforma corporativa self-hosted de identidade, autenticação, gerenciamento de segredos e observabilidade — construída sobre Docker Compose com segregação de redes, princípio de menor privilégio e preparada para migração para arquitetura multi-VPS enterprise.
 
-![Diagrama da Arquitetura](docs/IMG/02.%20Diagrama%20Visual.png)
+![Diagrama da Arquitetura](docs/IMG/diagrama-visual.png)
 
 ---
 

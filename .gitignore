@@ -50,3 +50,4 @@ infra/cloudflared/creds/
 
 # Local / personal (not for repo)
 CLAUDE.md
+docs/TXT/
