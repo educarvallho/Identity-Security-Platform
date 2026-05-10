@@ -1,0 +1,33 @@
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx-logs:/var/log/nginx
+    networks:
+      - edge-network
+      - auth-network
+      - monitoring-network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  nginx-logs:
+    name: nginx-logs
+
+networks:
+  edge-network:
+    external: true
+  auth-network:
+    external: true
+  monitoring-network:
+    external: true
