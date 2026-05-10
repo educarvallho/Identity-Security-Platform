@@ -1,0 +1,25 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - uptime-kuma-data:/app/data
+    networks:
+      - monitoring-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3001 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  uptime-kuma-data:
+    name: uptime-kuma-data
+
+networks:
+  monitoring-network:
+    external: true

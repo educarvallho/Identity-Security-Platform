@@ -1,0 +1,51 @@
+services:
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      # Admin credentials
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      # Server
+      GF_SERVER_ROOT_URL: https://${GRAFANA_HOSTNAME}
+      GF_SERVER_DOMAIN: ${GRAFANA_HOSTNAME}
+      # Keycloak OIDC SSO — roles mapped from Keycloak realm roles
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: Keycloak
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: ${GRAFANA_OIDC_CLIENT_ID}
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: ${GRAFANA_OIDC_CLIENT_SECRET}
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid email profile roles
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://${KEYCLOAK_HOSTNAME}/realms/${KC_REALM}/protocol/openid-connect/auth
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://${KEYCLOAK_HOSTNAME}/realms/${KC_REALM}/protocol/openid-connect/token
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://${KEYCLOAK_HOSTNAME}/realms/${KC_REALM}/protocol/openid-connect/userinfo
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(roles[*], 'admin') && 'Admin' || 'Viewer'"
+      GF_AUTH_SIGNOUT_REDIRECT_URL: https://${KEYCLOAK_HOSTNAME}/realms/${KC_REALM}/protocol/openid-connect/logout
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      # Logging
+      GF_LOG_LEVEL: warn
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - monitoring-network
+      - auth-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    user: "472:472"
+
+volumes:
+  grafana-data:
+    name: grafana-data
+
+networks:
+  monitoring-network:
+    external: true
+  auth-network:
+    external: true

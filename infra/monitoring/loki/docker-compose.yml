@@ -1,0 +1,28 @@
+services:
+  loki:
+    image: grafana/loki:2.9.4
+    container_name: loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - loki-data:/loki
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    networks:
+      - monitoring-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3100/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    user: "10001:10001"
+
+volumes:
+  loki-data:
+    name: loki-data
+
+networks:
+  monitoring-network:
+    external: true
