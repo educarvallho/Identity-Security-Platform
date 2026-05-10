@@ -1,0 +1,18 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      # Get token: cloudflared tunnel create platform && cloudflared tunnel token platform
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - edge-network
+    security_opt:
+      - no-new-privileges:true
+    user: "65532:65532"
+
+networks:
+  edge-network:
+    external: true

@@ -1,0 +1,43 @@
+# Cloudflare Tunnel — Ingress Configuration
+#
+# This file is for reference when using file-based credentials instead of the
+# TUNNEL_TOKEN environment variable (docker-compose.yml uses the token method).
+#
+# To use this file:
+#   1. cloudflared tunnel create platform
+#   2. Copy UUID from output below
+#   3. cloudflared tunnel route dns platform sso.YOUR_DOMAIN.com
+#   4. cloudflared tunnel route dns platform secrets.YOUR_DOMAIN.com
+#   5. cloudflared tunnel route dns platform monitoring.YOUR_DOMAIN.com
+#   6. cloudflared tunnel route dns platform status.YOUR_DOMAIN.com
+#
+# tunnel: YOUR_TUNNEL_UUID_HERE
+# credentials-file: /home/nonroot/.cloudflared/YOUR_TUNNEL_UUID_HERE.json
+
+ingress:
+  - hostname: sso.YOUR_DOMAIN.com
+    service: http://nginx:80
+    originRequest:
+      httpHostHeader: sso.YOUR_DOMAIN.com
+      connectTimeout: 30s
+
+  - hostname: secrets.YOUR_DOMAIN.com
+    service: http://nginx:80
+    originRequest:
+      httpHostHeader: secrets.YOUR_DOMAIN.com
+      connectTimeout: 30s
+
+  - hostname: monitoring.YOUR_DOMAIN.com
+    service: http://nginx:80
+    originRequest:
+      httpHostHeader: monitoring.YOUR_DOMAIN.com
+      connectTimeout: 30s
+
+  - hostname: status.YOUR_DOMAIN.com
+    service: http://nginx:80
+    originRequest:
+      httpHostHeader: status.YOUR_DOMAIN.com
+      connectTimeout: 30s
+
+  # Required catch-all rule
+  - service: http_status:404
