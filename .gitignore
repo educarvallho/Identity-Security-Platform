@@ -48,6 +48,5 @@ infra/nginx/ssl/*.key
 # Cloudflare tunnel credentials
 infra/cloudflared/creds/
 
-# My
-docs/
+# Local / personal (not for repo)
 CLAUDE.md

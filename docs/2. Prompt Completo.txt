@@ -1,0 +1,246 @@
+==================================================
+PROMPT — ARQUITETURA IAM / DEVSECOPS ENTERPRISE
+==================================================
+
+Você é um arquiteto de infraestrutura, DevSecOps e IAM enterprise.
+
+Preciso que você projete uma plataforma corporativa
+moderna de identidade, autenticação, gerenciamento
+de segredos e reverse proxy baseada em Docker
+Compose.
+
+O foco deve ser:
+- segurança
+- isolamento de rede
+- reprodutibilidade
+- portabilidade
+- futura migração para ambiente produtivo segregado
+
+
+==================================================
+OBSERVAÇÃO IMPORTANTE
+==================================================
+
+O repositório atual contém um sistema temporário
+que será utilizado como "cobaia" durante os testes.
+
+Estruture:
+- diretórios
+- nomes de pastas
+- containers
+- organização do projeto
+
+de forma que esse sistema de testes possa ser
+removido facilmente ao final da validação.
+
+Objetivo final do repositório:
+- manter apenas o sistema de Identidade e Segredos
+
+Caso identifique:
+- melhorias
+- oportunidades de modernização
+- ajustes arquiteturais
+- boas práticas adicionais
+
+descreva tudo explicitamente.
+
+
+==================================================
+OBJETIVOS DA ARQUITETURA
+==================================================
+
+Construir um ambiente self-hosted contendo:
+
+- SSO corporativo
+- gerenciamento centralizado de identidade
+- MFA obrigatório
+- gerenciamento centralizado de segredos
+- reverse proxy seguro
+- integração com Microsoft 365
+- Cloudflare Tunnel
+- PostgreSQL
+- Redis
+- observabilidade
+- backup automatizado
+- versionamento da infraestrutura
+- ambiente reproduzível via Git
+
+
+==================================================
+STACK OBRIGATÓRIA
+==================================================
+
+- Keycloak
+- Infisical
+- PostgreSQL
+- Redis
+- Nginx
+- Cloudflare Tunnel (cloudflared)
+- SMTP Relay OAuth2 para Microsoft 365
+- Docker Compose
+- Ubuntu Server 24.04
+
+
+==================================================
+REQUISITOS ARQUITETURAIS
+==================================================
+
+
+--------------------------------------------------
+SEGURANÇA
+--------------------------------------------------
+
+Implementar:
+
+- MFA obrigatório no Keycloak
+- MFA obrigatório no Infisical
+- segregação de redes Docker
+- princípio do menor privilégio
+- containers sem privilégios desnecessários
+- rootless quando possível
+- headers de segurança no Nginx
+- WAF Cloudflare
+- TLS obrigatório
+- nenhum banco exposto publicamente
+- Redis não exposto
+- SMTP relay interno apenas
+- secrets fora de arquivos .env
+- uso do Infisical para gerenciamento de secrets
+- rotação de secrets
+- backup criptografado
+- hardening Linux
+- fail2ban
+- SSH somente com chave
+- logs centralizados
+- auditoria de autenticação
+
+
+--------------------------------------------------
+INFRAESTRUTURA
+--------------------------------------------------
+
+Projetar:
+
+- segregação de redes Docker
+- healthchecks
+- restart policies
+- persistência de volumes
+- backups automáticos
+- observabilidade
+- monitoramento
+- logs centralizados
+- documentação operacional
+- disaster recovery
+
+
+==================================================
+REDE DOCKER
+==================================================
+
+Projetar redes separadas:
+
+- edge-network
+- auth-network
+- db-auth-network
+- monitoring-network
+- backup-network
+
+Explicar detalhadamente:
+
+- quais containers participam de cada rede
+- quem pode falar com quem
+- quais serviços possuem acesso externo
+- quais serviços devem permanecer isolados
+
+
+==================================================
+ESTRUTURA DO REPOSITÓRIO
+==================================================
+
+Projetar uma estrutura Git profissional contendo:
+
+- infraestrutura
+- Docker Compose segregado
+- configurações Nginx
+- configurações cloudflared
+- exports do Keycloak
+- automação de backup
+- observabilidade
+- scripts operacionais
+- documentação
+
+
+==================================================
+FLUXO DE IMPLANTAÇÃO
+==================================================
+
+Explicar detalhadamente:
+
+1. Preparação do Linux
+2. Hardening inicial
+3. Docker
+4. Redes Docker
+5. Nginx
+6. Cloudflare Tunnel
+7. PostgreSQL
+8. Redis
+9. Infisical
+10. SMTP Relay OAuth2
+11. Keycloak
+12. Integração Keycloak + Infisical
+13. Integração Microsoft 365
+14. Configuração MFA
+15. Backup
+16. Monitoramento
+17. Disaster recovery
+18. Export/import de realms do Keycloak
+19. Estratégia de migração para produção
+
+
+==================================================
+PRODUÇÃO FUTURA
+==================================================
+
+Projetar também:
+
+- arquitetura final segregada em múltiplas VPS
+- comunicação via rede privada
+- separação de servidores críticos
+- estratégia de isolamento do IAM
+- backups
+- replicação
+- restore
+- failover futuro
+
+
+==================================================
+RESULTADO ESPERADO
+==================================================
+
+A solução deve ser:
+
+- moderna
+- enterprise-grade
+- altamente segura
+- reproduzível
+- preparada para crescimento futuro
+- sem dependência de cloud pública
+- baseada em Docker self-hosted
+
+
+==================================================
+DIRETRIZES IMPORTANTES
+==================================================
+
+A resposta deve:
+
+- justificar decisões arquiteturais
+- explicar trade-offs
+- apresentar boas práticas enterprise
+- priorizar segurança e isolamento
+- considerar futura escalabilidade
+- evitar simplificações excessivas
+- utilizar nomenclatura profissional
+- manter foco em DevSecOps e IAM moderno
+
+==================================================
