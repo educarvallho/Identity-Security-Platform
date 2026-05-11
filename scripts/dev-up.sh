@@ -50,14 +50,14 @@ wait_healthy postgres-auth 120
 echo "[3/5] Starting Redis Auth..."
 docker compose -f "$INFRA_DIR/redis-auth/docker-compose.yml" up -d
 
-echo "[4/5] Starting Keycloak (dev mode — port 8080 exposed)..."
+echo "[4/5] Starting Keycloak (dev mode — port 8180 exposed)..."
 docker compose \
     -f "$INFRA_DIR/keycloak/docker-compose.yml" \
     -f "$INFRA_DIR/keycloak/docker-compose.dev.yml" \
     up -d
 wait_healthy keycloak 360
 
-echo "[5/5] Starting Infisical (dev mode — port 8081 exposed)..."
+echo "[5/5] Starting Infisical (dev mode — port 8181 exposed)..."
 docker compose \
     -f "$INFRA_DIR/infisical/docker-compose.yml" \
     -f "$INFRA_DIR/infisical/docker-compose.dev.yml" \
@@ -71,7 +71,7 @@ echo "  Infisical:       http://localhost:8181"
 echo ""
 echo "Credentials: check your .env (KC_ADMIN_USER / KC_ADMIN_PASSWORD)"
 echo ""
-echo "To also start monitoring (Grafana on :3000):"
+echo "To also start monitoring (Grafana on :3001):"
 echo "  docker compose -f infra/monitoring/loki/docker-compose.yml up -d"
 echo "  docker compose -f infra/monitoring/loki/docker-compose.yml up -d"
 echo "  docker compose -f infra/monitoring/grafana/docker-compose.yml \\"

@@ -218,6 +218,8 @@ bash scripts/healthcheck.sh
 
 ## URLs dos Serviços
 
+### Produção (via Cloudflare Tunnel → Nginx)
+
 | Serviço     | URL                                  | Porta interna |
 |-------------|--------------------------------------|---------------|
 | Keycloak    | `https://sso.YOUR_DOMAIN.com`        | 8080          |
@@ -225,7 +227,15 @@ bash scripts/healthcheck.sh
 | Grafana     | `https://monitoring.YOUR_DOMAIN.com` | 3000          |
 | Uptime Kuma | `https://status.YOUR_DOMAIN.com`     | 3001          |
 
-Nenhuma porta é mapeada para o host. Todo acesso externo via Cloudflare Tunnel → Nginx.
+Nenhuma porta é mapeada para o host em produção. Todo acesso externo via Cloudflare Tunnel → Nginx.
+
+### Dev local (`bash scripts/dev-up.sh`)
+
+| Serviço   | URL local                          |
+|-----------|------------------------------------|
+| Keycloak  | `http://localhost:8180/admin`      |
+| Infisical | `http://localhost:8181`            |
+| Grafana   | `http://localhost:3001` (opcional) |
 
 ---
 
