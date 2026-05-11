@@ -2,9 +2,9 @@
 # Local development startup — exposes Keycloak and Infisical directly on localhost.
 # Use this for initial configuration and testing WITHOUT a domain or Cloudflare Tunnel.
 #
-# Keycloak → http://localhost:8080
-# Infisical → http://localhost:8081
-# Grafana   → http://localhost:3000
+# Keycloak → http://localhost:8180
+# Infisical → http://localhost:8181
+# Grafana   → http://localhost:3001
 #
 # Requirements: Docker running, .env file populated (cp .env.template .env && edit)
 set -euo pipefail
@@ -65,13 +65,15 @@ docker compose \
 
 echo ""
 echo "=== Services starting. Access at: ==="
-echo "  Keycloak Admin:  http://localhost:8080/admin"
-echo "  Keycloak Health: http://localhost:8080/health/ready"
-echo "  Infisical:       http://localhost:8081"
+echo "  Keycloak Admin:  http://localhost:8180/admin"
+echo "  Keycloak Health: http://localhost:8180/health/ready"
+echo "  Infisical:       http://localhost:8181"
 echo ""
 echo "Credentials: check your .env (KC_ADMIN_USER / KC_ADMIN_PASSWORD)"
 echo ""
 echo "To also start monitoring (Grafana on :3000):"
 echo "  docker compose -f infra/monitoring/loki/docker-compose.yml up -d"
+echo "  docker compose -f infra/monitoring/loki/docker-compose.yml up -d"
 echo "  docker compose -f infra/monitoring/grafana/docker-compose.yml \\"
 echo "    -f infra/monitoring/grafana/docker-compose.dev.yml up -d"
+echo "  Grafana: http://localhost:3001"
