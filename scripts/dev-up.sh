@@ -31,10 +31,27 @@ wait_healthy() {
             echo "  Check logs: docker logs $name --tail 50"
             exit 1
         fi
-        # Print progress every 30s
         [ $((elapsed % 30)) -eq 0 ] && echo "  ... ${elapsed}s elapsed, still waiting for $name"
     done
     echo "  [OK] $name (${elapsed}s)"
+}
+
+# Keycloak-specific check: polls the exposed host port directly (avoids
+# depending on tools inside the minimal ubi9-micro container image).
+wait_keycloak() {
+    local timeout=360
+    echo "  Waiting for Keycloak on http://localhost:8180 (max ${timeout}s)..."
+    local elapsed=0
+    until curl -sf http://localhost:8180/health/ready > /dev/null 2>&1; do
+        sleep 5; elapsed=$((elapsed+5))
+        if [ $elapsed -ge $timeout ]; then
+            echo "  TIMEOUT: Keycloak not responding after ${timeout}s"
+            echo "  Check logs: docker logs keycloak --tail 50"
+            exit 1
+        fi
+        [ $((elapsed % 30)) -eq 0 ] && echo "  ... ${elapsed}s elapsed, still waiting for Keycloak"
+    done
+    echo "  [OK] Keycloak (${elapsed}s)"
 }
 
 echo "=== IAM Platform — Local Dev Startup ==="
@@ -55,7 +72,7 @@ docker compose \
     -f "$INFRA_DIR/keycloak/docker-compose.yml" \
     -f "$INFRA_DIR/keycloak/docker-compose.dev.yml" \
     up -d
-wait_healthy keycloak 360
+wait_keycloak
 
 echo "[5/5] Starting Infisical (dev mode — port 8181 exposed)..."
 docker compose \
@@ -72,7 +89,6 @@ echo ""
 echo "Credentials: check your .env (KC_ADMIN_USER / KC_ADMIN_PASSWORD)"
 echo ""
 echo "To also start monitoring (Grafana on :3001):"
-echo "  docker compose -f infra/monitoring/loki/docker-compose.yml up -d"
 echo "  docker compose -f infra/monitoring/loki/docker-compose.yml up -d"
 echo "  docker compose -f infra/monitoring/grafana/docker-compose.yml \\"
 echo "    -f infra/monitoring/grafana/docker-compose.dev.yml up -d"
