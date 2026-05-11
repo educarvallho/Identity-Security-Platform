@@ -26,9 +26,15 @@ wait_healthy() {
     local elapsed=0
     until docker inspect --format='{{.State.Health.Status}}' "$name" 2>/dev/null | grep -q "healthy"; do
         sleep 5; elapsed=$((elapsed+5))
-        [ $elapsed -ge $timeout ] && echo "  TIMEOUT: $name not healthy after ${timeout}s" && exit 1
+        if [ $elapsed -ge $timeout ]; then
+            echo "  TIMEOUT: $name not healthy after ${timeout}s"
+            echo "  Check logs: docker logs $name --tail 50"
+            exit 1
+        fi
+        # Print progress every 30s
+        [ $((elapsed % 30)) -eq 0 ] && echo "  ... ${elapsed}s elapsed, still waiting for $name"
     done
-    echo "  [OK] $name"
+    echo "  [OK] $name (${elapsed}s)"
 }
 
 echo "=== IAM Platform — Local Dev Startup ==="
@@ -49,7 +55,7 @@ docker compose \
     -f "$INFRA_DIR/keycloak/docker-compose.yml" \
     -f "$INFRA_DIR/keycloak/docker-compose.dev.yml" \
     up -d
-wait_healthy keycloak 180
+wait_healthy keycloak 360
 
 echo "[5/5] Starting Infisical (dev mode — port 8081 exposed)..."
 docker compose \
