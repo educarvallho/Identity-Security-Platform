@@ -45,7 +45,7 @@ docker compose -f "$INFRA_DIR/smtp-relay/docker-compose.yml" up -d
 
 echo "[5/8] Starting Keycloak..."
 docker compose -f "$INFRA_DIR/keycloak/docker-compose.yml" up -d
-wait_healthy keycloak 180
+wait_healthy keycloak 360
 
 echo "[6/8] Starting Infisical..."
 docker compose -f "$INFRA_DIR/infisical/docker-compose.yml" up -d
