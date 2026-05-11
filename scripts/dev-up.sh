@@ -42,7 +42,7 @@ wait_keycloak() {
     local timeout=360
     echo "  Waiting for Keycloak on http://localhost:8180 (max ${timeout}s)..."
     local elapsed=0
-    until curl -sf http://localhost:8180/health/ready > /dev/null 2>&1; do
+    until curl -sf http://localhost:8180/realms/master > /dev/null 2>&1; do
         sleep 5; elapsed=$((elapsed+5))
         if [ $elapsed -ge $timeout ]; then
             echo "  TIMEOUT: Keycloak not responding after ${timeout}s"
