@@ -37,6 +37,9 @@ O sistema de testes (`apps/weather-dashboard/`) demonstra integração com a pla
 | **Grafana**       | grafana/grafana:10.4.0              | Dashboards + OIDC SSO via Keycloak        | monitoring-network, auth-network     |
 | **Loki**          | grafana/loki:2.9.4                  | Logs centralizados, retenção 30 dias      | monitoring-network                   |
 | **Uptime Kuma**   | louislam/uptime-kuma:1              | Uptime monitoring, alertas                | monitoring-network                   |
+| **Promtail**      | grafana/promtail:2.9.4              | Coleta logs Docker → Loki            | monitoring-network               |
+| **Prometheus**    | prom/prometheus:v2.51.0             | Métricas TSDB, scraping, 30d retenção| monitoring-network               |
+| **Node Exporter** | prom/node-exporter:v1.8.0           | Métricas do host: CPU, RAM, disco    | monitoring-network               |
 
 ---
 
@@ -83,6 +86,35 @@ O sistema de testes (`apps/weather-dashboard/`) demonstra integração com a pla
 
 ---
 
+## Stack de Observabilidade
+
+```
+Containers e VPS
+      ↓
+Promtail          Node Exporter
+(logs Docker)     (métricas host)
+      ↓                 ↓
+    Loki           Prometheus
+(log store)      (metrics TSDB)
+      └──────┬────────┘
+           Grafana
+    (dashboards + alertas)
+
+Paralelamente:
+Uptime Kuma → health checks ativos → alertas push
+```
+
+| Componente    | Função                          | Porta interna |
+|---------------|---------------------------------|---------------|
+| Promtail      | Coleta logs via docker.sock     | 9080          |
+| Loki          | Armazena logs, query LogQL      | 3100          |
+| Prometheus    | Scraping e armazenamento TSDB   | 9090          |
+| Node Exporter | Métricas do host                | 9100          |
+| Grafana       | Dashboards operacionais         | 3000          |
+| Uptime Kuma   | Uptime checks + alertas         | 3001          |
+
+---
+
 ## Estrutura do Repositório
 
 ```
@@ -116,11 +148,20 @@ Identity-Security-Platform/
 │       ├── grafana/
 │       │   ├── docker-compose.yml
 │       │   └── provisioning/
-│       │       ├── datasources/loki.yaml     # Loki pré-configurado
+│       │       ├── datasources/loki.yaml       # Loki pré-configurado
+│       │       ├── datasources/prometheus.yaml # Prometheus datasource
 │       │       └── dashboards/dashboard.yaml
 │       ├── loki/
 │       │   ├── docker-compose.yml
-│       │   └── loki-config.yaml              # Retenção 30 dias
+│       │   └── loki-config.yaml                # Retenção 30 dias
+│       ├── promtail/
+│       │   ├── docker-compose.yml
+│       │   └── promtail-config.yaml            # Docker log scraping
+│       ├── prometheus/
+│       │   ├── docker-compose.yml
+│       │   └── prometheus.yml                  # 30d retention, node-exporter target
+│       ├── node-exporter/
+│       │   └── docker-compose.yml
 │       └── uptime-kuma/
 │           └── docker-compose.yml
 ├── scripts/
@@ -344,7 +385,7 @@ docker exec keycloak /opt/keycloak/bin/kc.sh import --file /tmp/realm-export.jso
 | 13 | Integrar Microsoft 365 | [onboarding.md](docs/onboarding.md) §5 |
 | 14 | Configurar MFA obrigatório | [security.md](docs/security.md) + `realm-export.json` |
 | 15 | Configurar backup automático | [backup.md](docs/backup.md) |
-| 16 | Subir monitoramento | `infra/monitoring/` |
+| 16 | Subir monitoramento | `infra/monitoring/` — ordem: loki → promtail → prometheus → node-exporter → grafana → uptime-kuma |
 | 17 | Testar disaster recovery | [disaster-recovery.md](docs/disaster-recovery.md) |
 | 18 | Export/import de realms | `bash scripts/backup.sh` (realm export automático) |
 | 19 | Estratégia de migração para produção | seção abaixo |
