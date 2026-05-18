@@ -39,6 +39,9 @@ check_container cloudflared
 echo ""
 echo "--- Monitoring ---"
 check_container loki
+check_container promtail
+check_container prometheus
+check_container node-exporter
 check_container grafana
 check_container uptime-kuma
 
