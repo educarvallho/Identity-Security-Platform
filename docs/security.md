@@ -66,7 +66,7 @@ Todas as regras já aplicadas nos `docker-compose.yml`:
 | `no-new-privileges:true`         | Todos os containers   |
 | Imagens Alpine (menor superfície)| postgres, redis, nginx|
 | Redis `read_only: true`          | redis-auth            |
-| Usuário não-root                 | Grafana (472), Loki (10001), cloudflared (65532), Node Exporter (65534) |
+| Usuário não-root                 | Grafana (472), Loki (10001), cloudflared (65532) |
 | Portas não expostas ao host       | redis, postgres, smtp, keycloak, infisical |
 | Redes segregadas                 | 5 redes Docker        |
 | Prometheus/Loki não expostos     | Acesso restrito à monitoring-network — sem mapeamento de portas ao host |

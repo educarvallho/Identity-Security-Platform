@@ -52,7 +52,7 @@ Identity-Security-Platform/
 │   ├── dev-up.sh             # Startup local — wait_keycloak usa curl no host :8180
 │   ├── backup.sh             # pg_dumpall + realm export + GPG AES256
 │   ├── restore.sh            # GPG decrypt + psql restore
-│   └── healthcheck.sh        # Verifica 10 containers + 5 redes
+│   └── healthcheck.sh        # Verifica 13 containers + 5 redes
 ├── docs/
 │   ├── IMG/diagrama-visual.png   # Diagrama usado no README (sem espaços no nome)
 │   ├── TXT/                      # Arquivos de referência originais (gitignored)
@@ -78,7 +78,7 @@ Identity-Security-Platform/
 | edge-network       | cloudflared, nginx                                       |
 | auth-network       | nginx, keycloak, smtp-relay, redis-auth, infisical       |
 | db-auth-network    | keycloak, infisical, postgres-auth                       |
-| monitoring-network | grafana, loki, uptime-kuma, nginx                        |
+| monitoring-network | grafana, loki, promtail, prometheus, node-exporter, uptime-kuma, nginx |
 | backup-network     | postgres-auth, infisical                                 |
 
 **Regra:** `postgres-auth` e `redis-auth` NUNCA estão na edge-network. Deny-by-default.
