@@ -160,11 +160,11 @@ openssl rand -hex 16      # INFISICAL_ENCRYPTION_KEY (exige exatamente 32 hex ch
 
 ## Configuração Inicial (Ordem)
 
-1. `bash scripts/dev-up.sh` — sobe postgres + redis + keycloak + infisical
+1. `bash scripts/dev-up.sh` — sobe toda a stack: postgres + redis + keycloak + infisical + loki + promtail + prometheus + node-exporter + grafana + uptime-kuma
 2. **Keycloak**: `http://localhost:8180/admin` → criar realm importando `infra/keycloak/realm-export.json`
 3. **Infisical**: `http://localhost:8181` → primeiro registro vira admin (auth independente)
 4. Opcional: integrar SSO via Infisical Settings → SSO (OIDC apontando para Keycloak)
-5. **Grafana** (opcional): `docker compose --env-file .env -f infra/monitoring/grafana/docker-compose.yml -f infra/monitoring/grafana/docker-compose.dev.yml up -d` → `http://localhost:3001`
+5. **Grafana**: `http://localhost:3001` (já iniciado pelo `dev-up.sh`)
 
 ---
 

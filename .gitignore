@@ -49,5 +49,7 @@ infra/nginx/ssl/*.key
 infra/cloudflared/creds/
 
 # Local / personal (not for repo)
-CLAUDE.md
 docs/TXT/
+
+# Claude Code local config
+.claude/
