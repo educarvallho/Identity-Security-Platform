@@ -18,6 +18,9 @@ A Identity Security Platform é uma plataforma self-hosted de identidade e geren
 | Grafana         | Dashboards, OIDC SSO via Keycloak             | grafana/grafana:10.4.0              |
 | Loki            | Logs centralizados, retenção 30 dias          | grafana/loki:2.9.4                  |
 | Uptime Kuma     | Monitoramento de uptime, alertas              | louislam/uptime-kuma:1              |
+| Promtail        | Coleta logs Docker → Loki                     | grafana/promtail:2.9.4              |
+| Prometheus      | Scraping métricas TSDB, 30d retenção          | prom/prometheus:v2.51.0             |
+| Node Exporter   | Métricas host: CPU, RAM, disco, rede          | prom/node-exporter:v1.8.0           |
 
 ## Fluxo de Tráfego
 
@@ -39,10 +42,30 @@ postgres-auth      redis-auth
 ## Ordem de Dependência
 
 ```
-postgres-auth → redis-auth → smtp-relay → keycloak → infisical → nginx → cloudflared → monitoring
+postgres-auth → redis-auth → smtp-relay → keycloak → infisical → nginx → cloudflared
+                                                                              ↓
+                                             loki → promtail
+                                             prometheus → node-exporter
+                                             grafana → uptime-kuma
 ```
 
-Gerenciada pelo `scripts/up.sh` com healthchecks automáticos.
+Gerenciada pelo `scripts/up.sh` com `wait_healthy` para serviços críticos.
+
+## Stack de Observabilidade
+
+```
+Containers e VPS
+      ↓
+Promtail (logs)       Node Exporter (métricas host)
+      ↓                       ↓
+    Loki                 Prometheus
+      └──────────┬──────────┘
+               Grafana
+          (dashboards + alertas)
+
+Paralelamente:
+Uptime Kuma → health checks ativos (HTTP/TCP) → alertas push
+```
 
 ## Redes Docker
 

@@ -115,7 +115,25 @@ Aguarde todos os serviços ficarem healthy (~3–5 minutos).
 3. Loki já está pré-configurado como datasource
 4. Para ativar SSO via Keycloak: confirme que `GRAFANA_OIDC_CLIENT_SECRET` no `.env` corresponde ao segredo configurado no client Keycloak
 
-## 10. Configurar Backup Automático
+## 10. Subir Stack de Observabilidade
+
+```bash
+# Subir stack de observabilidade (na ordem correta)
+docker compose -f infra/monitoring/loki/docker-compose.yml up -d
+# Aguardar Loki healthy antes de Promtail
+docker inspect --format='{{.State.Health.Status}}' loki  # deve retornar "healthy"
+
+docker compose -f infra/monitoring/promtail/docker-compose.yml up -d
+docker compose -f infra/monitoring/prometheus/docker-compose.yml up -d
+docker compose -f infra/monitoring/node-exporter/docker-compose.yml up -d
+docker compose -f infra/monitoring/grafana/docker-compose.yml up -d
+docker compose -f infra/monitoring/uptime-kuma/docker-compose.yml up -d
+
+# Grafana: https://monitoring.YOUR_DOMAIN.com
+# Datasources provisionados automaticamente: Loki e Prometheus
+```
+
+## 11. Configurar Backup Automático
 
 ```bash
 crontab -e
@@ -127,7 +145,7 @@ Adicione:
 0 2 * * * /opt/iam-platform/scripts/backup.sh >> /var/log/iam-backup.log 2>&1
 ```
 
-## 11. Verificação Final
+## 12. Verificação Final
 
 ```bash
 bash scripts/healthcheck.sh
