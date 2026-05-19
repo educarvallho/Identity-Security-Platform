@@ -16,7 +16,7 @@ services:
       KC_HOSTNAME_STRICT_HTTPS: "true"
       KC_HTTP_ENABLED: "true"
       KC_HTTPS_ENABLED: "false"
-      KC_PROXY: edge
+      KC_PROXY_HEADERS: xforwarded
       KC_HTTP_PORT: 8080
       # Admin credentials (used only on first boot to create the admin user)
       KEYCLOAK_ADMIN: ${KC_ADMIN_USER}
