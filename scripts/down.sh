@@ -9,6 +9,9 @@ echo "=== Identity Security Platform — Shutdown ==="
 
 docker compose -f "$INFRA_DIR/monitoring/uptime-kuma/docker-compose.yml" down 2>/dev/null || true
 docker compose -f "$INFRA_DIR/monitoring/grafana/docker-compose.yml" down 2>/dev/null || true
+docker compose -f "$INFRA_DIR/monitoring/node-exporter/docker-compose.yml" down 2>/dev/null || true
+docker compose -f "$INFRA_DIR/monitoring/prometheus/docker-compose.yml" down 2>/dev/null || true
+docker compose -f "$INFRA_DIR/monitoring/promtail/docker-compose.yml" down 2>/dev/null || true
 docker compose -f "$INFRA_DIR/monitoring/loki/docker-compose.yml" down 2>/dev/null || true
 docker compose -f "$INFRA_DIR/cloudflared/docker-compose.yml" down 2>/dev/null || true
 docker compose -f "$INFRA_DIR/nginx/docker-compose.yml" down 2>/dev/null || true
