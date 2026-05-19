@@ -209,14 +209,56 @@ Script shell em `docker-entrypoint-initdb.d/` para substituição de env vars na
 
 ---
 
+## Padrão de Bootstrap de VPS (Todos os Projetos)
+
+Processo padronizado para provisionar qualquer VPS do zero. Documentação completa: `docs/vps-bootstrap.md`.
+
+### Scripts (em ordem)
+
+```bash
+# 1. Como root no servidor:
+bash scripts/bootstrap/01-harden-vps.sh
+
+# 2. Verificar SSH como deploy em terminal separado, depois:
+bash scripts/bootstrap/01-harden-vps.sh --finalize   # desativa root
+
+# 3. Como deploy:
+bash scripts/bootstrap/02-setup-repo.sh
+
+# 4. Como deploy, na raiz do repo:
+bash scripts/bootstrap/03-generate-env.sh
+
+# 5. Subir a plataforma:
+bash scripts/up.sh
+```
+
+### Princípios obrigatórios para todos os servidores
+
+- **User não-root**: criar `deploy` (sudo + docker), desativar root após validação
+- **UFW**: `deny incoming` + `allow outgoing` + `allow ssh` — conntrack cobre Docker/NTP/pulls
+- **fail2ban**: sshd jail, `bantime=86400`, `maxretry=3`
+- **NTP**: `time.cloudflare.com` como primário
+- **SSH**: `PasswordAuthentication no`, `MaxAuthTries 3`, apenas chave pública
+- **Secrets**: nunca em código ou imagens — `.env` com `chmod 600`, gitignored → migrar para Infisical
+- **Git workflow**: sempre editar local → commit → push → `git pull` no servidor. Nunca editar diretamente no servidor sem commit.
+
+### Lições aprendidas (não repetir)
+
+- `X-Forwarded-Proto $scheme` → spinner infinito no Keycloak/Infisical atrás do Cloudflare. Usar `X-Forwarded-Proto https` (hardcoded).
+- Senhas com `+/=` em URLs de conexão quebram o parser. Redis e Infisical DB: sempre `openssl rand -hex 32`.
+- Keycloak healthcheck: imagem `ubi9-micro` sem `curl`/`wget` — usar TCP ou `/realms/master` do host.
+- Ordem do nginx: todos os containers referenciados em blocos `upstream` devem iniciar antes do nginx, senão crash loop.
+- promtail:2.9.4 sem wget/curl — healthcheck via `/proc/net/tcp6` (porta 9080 = hex `2378`).
+
+---
+
 ## Roadmap — VPS com Domínio
 
-1. Provisionar Ubuntu 24.04 + Docker
-2. `cloudflared tunnel create platform` → obter token
-3. Preencher `.env` com domínio real (substituir `YOUR_DOMAIN.com`)
+1. Provisionar Ubuntu 24.04+ / Debian 12+ + seguir `scripts/bootstrap/`
+2. Cloudflare: criar tunnel, configurar 4 public hostnames
+3. `bash scripts/bootstrap/03-generate-env.sh` → preenche `.env` automaticamente
 4. `bash scripts/up.sh` (sem overrides dev)
-5. DNS Cloudflare para 4 subdomínios: `sso`, `secrets`, `monitoring`, `status`
-6. Keycloak em produção usa `command: start` (não start-dev)
+5. Keycloak em produção usa `command: start` (não start-dev)
 
 Migração multi-VPS: estrutura por serviço facilita mover cada `infra/<service>/` para VPS dedicada.
 
@@ -224,11 +266,11 @@ Migração multi-VPS: estrutura por serviço facilita mover cada `infra/<service
 
 ## Status Atual
 
-- **Keycloak**: funcionando em dev (`http://localhost:8180/admin`) ✓
-- **Infisical**: container sobe (porta 8181) — configuração inicial pendente
-- **Monitoramento**: implementado — Grafana + Loki + Promtail + Prometheus + Node Exporter + Uptime Kuma ✓
+- **Keycloak**: rodando em produção (`https://sso.weatherriskdashboard.online`) ✓
+- **Infisical**: container up — configuração inicial pendente
+- **Monitoramento**: Grafana + Loki + Promtail + Prometheus + Node Exporter + Uptime Kuma ✓
 - **SMTP**: deixado para depois
-- **Produção/VPS**: aguardando VPS disponível
+- **Produção/VPS**: Hetzner Debian 13, 13/13 containers healthy ✓
 
 ---
 

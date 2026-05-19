@@ -203,7 +203,39 @@ Identity-Security-Platform/
 
 ---
 
-## Setup Rápido
+## Deploy em Novo Servidor
+
+Para provisionar um VPS do zero até a plataforma rodando, use os scripts de bootstrap. Processo completo documentado em [docs/vps-bootstrap.md](docs/vps-bootstrap.md).
+
+```bash
+# 1. No servidor, como root:
+bash scripts/bootstrap/01-harden-vps.sh
+# → SSH, UFW, fail2ban, NTP Cloudflare, Docker, user deploy
+
+# 2. Verificar SSH como deploy, depois finalizar:
+bash scripts/bootstrap/01-harden-vps.sh --finalize
+# → Desativa root
+
+# 3. Como deploy:
+bash scripts/bootstrap/02-setup-repo.sh
+# → Clone do repo em /opt/iam-platform
+
+# 4. Como deploy, na raiz do repo:
+bash scripts/bootstrap/03-generate-env.sh
+# → Pede: domínio, token Cloudflare, senha admin
+# → Gera todos os demais secrets automaticamente
+
+# 5. Subir a plataforma:
+bash scripts/up.sh
+
+# 6. Verificar:
+bash scripts/healthcheck.sh
+# → Esperado: 13/13 containers healthy
+```
+
+---
+
+## Setup Rápido (ambiente local / dev)
 
 ### 1. Clone e configure
 
@@ -223,25 +255,15 @@ openssl rand -base64 32
 # Para INFISICAL_ENCRYPTION_KEY (exatamente 32 hex chars):
 openssl rand -hex 16
 
-# Para INFISICAL_AUTH_SECRET (mínimo 32 chars):
-openssl rand -base64 32
+# Para REDIS_PASSWORD e INFISICAL_DB_PASSWORD (vão em URLs — use hex):
+openssl rand -hex 32
 ```
 
 ### 3. Configure Cloudflare Tunnel
 
-```bash
-cloudflared tunnel login
-cloudflared tunnel create platform
-
-# Crie as rotas DNS (substitua YOUR_DOMAIN.com)
-cloudflared tunnel route dns platform sso.YOUR_DOMAIN.com
-cloudflared tunnel route dns platform secrets.YOUR_DOMAIN.com
-cloudflared tunnel route dns platform monitoring.YOUR_DOMAIN.com
-cloudflared tunnel route dns platform status.YOUR_DOMAIN.com
-
-# Obtenha o token e coloque em CLOUDFLARE_TUNNEL_TOKEN no .env
-cloudflared tunnel token platform
-```
+No Cloudflare Zero Trust Dashboard: **Networks → Tunnels → Create tunnel → Cloudflared**.
+Copie o token gerado e coloque em `CLOUDFLARE_TUNNEL_TOKEN` no `.env`.
+Configure os public hostnames apontando para `http://nginx:80`.
 
 ### 4. Suba a plataforma
 
@@ -450,6 +472,7 @@ cd ../.. && rm -rf apps/
 
 | Documento | Conteúdo |
 |-----------|----------|
+| [vps-bootstrap.md](docs/vps-bootstrap.md) | **Bootstrap de novo servidor** — scripts, checklist, decisões de design, troubleshooting |
 | [arquitetura.md](docs/arquitetura.md) | Componentes, fluxos, decisões de design, roadmap multi-VPS |
 | [redes.md](docs/redes.md) | Segregação Docker, matriz de comunicação, troubleshooting |
 | [backup.md](docs/backup.md) | Estratégia 3-2-1, frequência, criptografia, validação mensal |
